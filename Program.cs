@@ -8,6 +8,7 @@ namespace POS
 {
 	class Program
 	{
+		//TODO napraviti izmenu artikala :) 
 		public static List<Artikal> a = new List<Artikal>(); //null u ovom trenutku
 		static void Main(string[] args)
 		{
@@ -25,15 +26,42 @@ namespace POS
 						Console.WriteLine();
 						foreach (Artikal art in a)
 						{ 
-							Console.WriteLine($"{art.naziv} - {art.uCena} - {art.marza} --- {art.IzlaznaCena()}");
+							Console.WriteLine(art);
 						}
 						break;
 					case '3':
+						Brisanje();
+						break;
+					case '4':
 						Environment.Exit(123);
+						break;
+					default:
+						Console.WriteLine("\nGreska u unosu!");
 						break;
 				}
 				
 			} while(true);
+		}
+
+		static void Brisanje()
+		{
+			//TODO brisanje kao u proslom primeru, tj. Remove a ne 
+			//removeAt (preporucljiva metoda sa out varijablom za
+			//pronalaznje objekta :) )
+
+			Console.WriteLine("\nUnesite sifru artikla: ");
+			string sifra = Console.ReadLine();
+
+			for (int indeks = 0; indeks < a.Count; indeks++)
+			{
+				if (a[indeks].sifra == sifra)
+				{
+					a.RemoveAt(indeks);
+					Console.WriteLine("Uspesno obrisan artikal!");
+					return;
+				}
+			}
+			Console.WriteLine("Nismo nasli artikal sa tom sifrom!");
 		}
 
 		static void Unos()
@@ -52,9 +80,41 @@ namespace POS
 					{
 						if (int.TryParse(unos.Split(' ')[3], out int marza))
 						{
-							a.Add(new Artikal(unos.Split(' ')[1], unos.Split(' ')[0],
-								cena, marza));
-							break;
+							bool duplikatSifra = false;
+							bool duplikatNaziv = false;
+							foreach (Artikal art in a)
+							{
+								if (art.sifra == unos.Split(' ')[0])
+								{
+									duplikatSifra = true;
+								} 
+								
+								if (art.naziv == unos.Split(' ')[1])
+								{
+									duplikatNaziv = true;
+									break;
+								}
+							}
+
+							if (!duplikatSifra && !duplikatNaziv)
+							{
+								a.Add(new Artikal(unos.Split(' ')[1], unos.Split(' ')[0],
+																	cena, marza));
+								break;
+							} else
+							{
+								if (duplikatSifra)
+								{
+									Console.WriteLine("Vec postoji sifra!");
+								} 
+
+								if (duplikatNaziv)
+								{
+									Console.WriteLine("Vec postoji naziv!");
+								}
+							}
+
+							
 						} else
 						{
 							Console.WriteLine("Proverite marzu! ");
@@ -77,7 +137,8 @@ namespace POS
 		{
 			Console.WriteLine("1. Unos artikla");
 			Console.WriteLine("2. Ispis artikala");
-			Console.WriteLine("3. Izlaz");
+			Console.WriteLine("3. Brisanje");
+			Console.WriteLine("4. Izlaz");
 			Console.WriteLine("------------");
 			Console.Write("Izaberite: ");
 		}
@@ -101,6 +162,11 @@ namespace POS
 			sifra = s;
 			uCena = c;
 			marza = m;
+		}
+
+		public override string ToString()
+		{
+			return $"{sifra} -- {naziv} ulazna cena:{uCena} marza:{marza}% - izlazna cena: {IzlaznaCena()}";
 		}
 	}
 }
